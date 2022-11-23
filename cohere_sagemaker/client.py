@@ -32,8 +32,8 @@ class Client:
         presence_penalty: float = 0.0,
         # not implemented in API
         # stop_sequences: List[str] = None,
-        # this changed from 'NONE'
-        return_likelihoods: str = None,
+        # not implemented in API
+        # return_likelihoods: str = None,
         # not implemented in API
         truncate: str = None,
         variant: str = None
@@ -46,8 +46,7 @@ class Client:
             'k': k,
             'p': p,
             'frequency_penalty': frequency_penalty,
-            'presence_penalty': presence_penalty,
-            'return_likelihoods': return_likelihoods,
+            'presence_penalty': presence_penalty
         }
         for key, value in list(json_params.items()):
             if value is None:
@@ -76,15 +75,13 @@ class Client:
         for gen in response['generations']:
             likelihood = None
             token_likelihoods = None
-            if return_likelihoods == 'GENERATION' or return_likelihoods == 'ALL':
-                likelihood = gen['likelihood']
             if 'token_likelihoods' in gen.keys():
                 token_likelihoods = []
                 for likelihoods in gen['token_likelihoods']:
                     token_likelihood = likelihoods['likelihood'] if 'likelihood' in likelihoods.keys() else None
                     token_likelihoods.append(TokenLikelihood(likelihoods['token'], token_likelihood))
             generations.append(Generation(gen['text'], likelihood, token_likelihoods))
-        return Generations(generations, return_likelihoods)
+        return Generations(generations)
 
     def close(self):
         self._client.close()
